@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         concat: {
-            EntityManagerJS: {
+            EntityJs: {
                 dest: "build/entity.js",
                 src: [
                     "src/.prefix",
