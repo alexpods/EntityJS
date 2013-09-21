@@ -1,0 +1,24 @@
+{
+    "name": "EntityManager",
+    "version": "0.0.0",
+    "description": "Portable JavasScript OOP library for entity manipulation",
+    "author": {
+        "name":  "Aleksey Podskrebyshev (Alex Pods)",
+        "email": "aleksey.podskrebyshev@gmail.com",
+        "url":   "http://alexpods.com"
+    },
+    "keywords": [
+        "oop",
+        "class",
+        "entity"
+    ],
+    "homepage": "http://em.alexpods.com",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url":  "http://github.com/alexpods/EntityManagerJS.git"
+    },
+    "devDependencies": {
+        "grunt": "~0.4.1"
+    }
+}
