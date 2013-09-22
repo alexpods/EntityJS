@@ -11,7 +11,11 @@ module.exports = function(grunt) {
                 dest: "build/entity.js",
                 src: [
                     "src/.prefix",
+                    "src/helper.js",
                     "src/manager.js",
+                    "src/class-builder.js",
+                    "src/event.js",
+                    "src/entity.js",
                     "src/.suffix"
                 ]
             }

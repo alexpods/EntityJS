@@ -1,2 +1,4 @@
 
+    global.Event = Event;
+
 })(this, document);

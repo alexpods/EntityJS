@@ -1,4 +1,4 @@
-EntityManagerJS
+EntityJS
 =========
 
-EntityManagerJs is portable JavasScript OOP library for entity manipulation
+EntityJs is portable JavasScript OOP library for entity manipulation
