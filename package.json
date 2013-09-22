@@ -22,7 +22,5 @@
     "grunt": "~0.4.1",
     "grunt-contrib-concat": "~0.3.0"
   },
-  "gitHead": "4016c0e9a6d928e59ce4ef0d7a6b170be453b03f",
-  "main": "index.js",
   "readmeFilename": "README.md"
 }
