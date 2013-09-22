@@ -1,4 +1,5 @@
-(function(global, document, undefined) {
+(function(global, undefined) {
+
 
 var Helper = {
     isEmpty: function(value) {
@@ -50,14 +51,24 @@ var Helper = {
     isFunction: function(value) {
         return typeof value === 'function';
     },
+    inObject: function(proeprty, object) {
+        return property in object;
+    },
+    propertyInObject: function(property, object) {
+        return this.inObject(property, object) && !this.isFunction(object[property]);
+    },
     extend: function(object, properties) {
         for (var name in properties) {
             object[name] = properties[name];
         }
+    },
+    toCamelCase: function(name) {
+        return name.replace(/(?:_)\w/, function (match) { return match[1].toUpperCase(); });
     }
 };
 var Manager = {
 
+    _uid:     0,
     _classes: {},
 
     addClass: function(clazz) {
@@ -82,20 +93,84 @@ var Manager = {
             throw new Error('Class "' + name + '" does not exists in entity manager!');
         }
         return this._classes[name];
+    },
+
+    getNextUid: function() {
+        return ++this._uid;
     }
 };
 var ClassBuilder = {
+
+    _metaOptions: {},
 
     buildClass: function(name, parent, meta) {
         if (typeof meta == 'undefined') {
             meta   = parent;
             parent = undefined;
         }
-
         Event.trigger('BEFORE_CREATE_CLASS', { className: name });
 
+        var clazz = this.applyMeta(this.createClass(name, parent), meta);
 
         Event.trigger('AFTER_CREATE_CLASS', { className: name });
+        return clazz;
+    },
+
+    createClass: function(name, parent) {
+
+        var Clazz = function() { return function (data) { return BaseClass.call(this, data); } };
+        Clazz.prototype = Object.create(!Helper.isEmpty(parent) ? parent : null);
+
+        var clazz = new Clazz();
+        clazz.prototype = Object.create(!Helper.isEmpty(parent) ? parent.prototype : null);
+
+        clazz.name   = name;
+        clazz.parent = parent;
+
+        clazz.prototype.class = clazz;
+
+        return clazz;
+    },
+
+    applyMeta: function(clazz, meta) {
+
+        clazz.meta = meta;
+
+        for (var i = 0, ii = this._metaOptions.length; i < ii; ++i) {
+            clazz = this._metaOptions[i].apply(clazz, meta);
+        }
+        return clazz;
+    },
+
+    getMetaOptions: function() {
+        return this._metaOptions;
+    },
+
+    addMetaOption: function(option, applier) {
+        if (!(option instanceof MetaOption)) {
+            option = new MetaOption(option, applier);
+        }
+        this._metaOptions[option.getName()] = option;
+        return this;
+    },
+
+    getMetaOption: function(name) {
+        if (!this.hasMetaOption(name)) {
+            throw new Error('Meta option "' + name + '" does not exists!');
+        }
+        return this._metaOptions[name];
+    },
+
+    hasMetaOption: function(name) {
+        return !Helper.isEmpty(this._metaOptions[name]);
+    },
+
+    removeMetaOption: function(name) {
+        if (!this.hasMetaOption(name)) {
+            throw new Error('Meta option "' + name + '" does not exists!');
+        }
+        delete this._metaOptions[name];
+        return this;
     }
 };
 var Event = {
@@ -192,9 +267,10 @@ Helper.extend(Entity, {
     Manager:      Manager,
     ClassBuilder: ClassBuilder,
     Helper:       Helper,
-    Event:        Event
-})
+    Event:        Event,
+    MetaOption:   MetaOption
+});
 
-    global.Event = Event;
+    global.Entity = Entity;
 
-})(this, document);
+})(this);
