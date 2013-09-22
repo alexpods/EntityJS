@@ -48,9 +48,18 @@ var Helper = {
     isFunction: function(value) {
         return typeof value === 'function';
     },
+    inObject: function(proeprty, object) {
+        return property in object;
+    },
+    propertyInObject: function(property, object) {
+        return this.inObject(property, object) && !this.isFunction(object[property]);
+    },
     extend: function(object, properties) {
         for (var name in properties) {
             object[name] = properties[name];
         }
+    },
+    toCamelCase: function(name) {
+        return name.replace(/(?:_)\w/, function (match) { return match[1].toUpperCase(); });
     }
 };

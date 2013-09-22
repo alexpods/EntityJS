@@ -1,4 +1,4 @@
 
-    global.Event = Event;
+    global.Entity = Entity;
 
-})(this, document);
+})(this);

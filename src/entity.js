@@ -21,5 +21,6 @@ Helper.extend(Entity, {
     Manager:      Manager,
     ClassBuilder: ClassBuilder,
     Helper:       Helper,
-    Event:        Event
-})
+    Event:        Event,
+    MetaOption:   MetaOption
+});

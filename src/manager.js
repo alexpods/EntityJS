@@ -1,5 +1,6 @@
 var Manager = {
 
+    _uid:     0,
     _classes: {},
 
     addClass: function(clazz) {
@@ -24,5 +25,9 @@ var Manager = {
             throw new Error('Class "' + name + '" does not exists in entity manager!');
         }
         return this._classes[name];
+    },
+
+    getNextUid: function() {
+        return ++this._uid;
     }
 };
