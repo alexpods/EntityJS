@@ -1,4 +1,18 @@
 
+    Helper.extend(Entity, {
+        Helper:       Helper,
+        Manager:      Manager,
+        Class:        Class,
+        ClassBuilder: ClassBuilder,
+        Event:        Event,
+        Meta:         Meta,
+        MetaOption:   MetaOption,
+
+        MetaOptionConstants:  MetaOptionConstants,
+        MetaOptionMethods:    MetaOptionMethods,
+        MetaOptionProperties: MetaOptionProperties
+    });
+
     global.Entity = Entity;
 
 })(this);

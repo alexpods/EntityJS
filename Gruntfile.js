@@ -7,15 +7,25 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         concat: {
-            EntityJs: {
+            EntityJS: {
                 dest: "build/entity.js",
                 src: [
                     "src/.prefix",
-                    "src/helper.js",
-                    "src/manager.js",
-                    "src/class-builder.js",
-                    "src/event.js",
-                    "src/entity.js",
+                     
+                    "src/Entity.js",
+                    "src/Entity.Helper.js",
+
+                    "src/Entity.Meta.js",
+                    "src/Entity.MetaOption.js",
+                    "src/Entity.MetaOptionConstants.js",
+                    "src/Entity.MetaOptionMethods.js",
+                    "src/Entity.MetaOptionProperties.js",
+
+                    "src/Entity.Manager.js",
+                    "src/Entity.Event.js",
+                    "src/Entity.Class.js",
+                    "src/Entity.ClassBuilder.js",
+
                     "src/.suffix"
                 ]
             }

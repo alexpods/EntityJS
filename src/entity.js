@@ -16,11 +16,3 @@ var Entity = function(name, parent, meta) {
         return clazz;
     }
 }
-
-Helper.extend(Entity, {
-    Manager:      Manager,
-    ClassBuilder: ClassBuilder,
-    Helper:       Helper,
-    Event:        Event,
-    MetaOption:   MetaOption
-});
