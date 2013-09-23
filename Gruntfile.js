@@ -11,7 +11,7 @@ module.exports = function(grunt) {
                 dest: "build/entity.js",
                 src: [
                     "src/.prefix",
-                     
+
                     "src/Entity.js",
                     "src/Entity.Helper.js",
 
