@@ -21,6 +21,8 @@ var ClassBuilder = {
 
     createClass: function(name, parent) {
 
+        var parent = parent || Class;
+
         var clazz = Helper.createClass({
             parent: parent || Class
         });

@@ -29,7 +29,7 @@ var MetaOptionConstants = MetaOption({
                 }
                 constants = constants[name];
 
-                if (Helper.isCompound(constants)) {
+                if (Helper.isObject(constants)) {
                     var self = this, callback = function(name) {
                         return self.__getConstant(name, constants)
                     }

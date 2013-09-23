@@ -34,7 +34,7 @@ var Helper = {
         return this.isArray(value) && value.length === 0;
     },
     isObject: function(value) {
-        return typeof value === 'object' && !this.isNull(value);
+        return typeof value === 'object' && !this.isNull(value) && !this.isArray(value);
     },
     isEmptyObject: function(value) {
         if (!this.isObject(value)) {

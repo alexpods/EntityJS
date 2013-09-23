@@ -91,18 +91,18 @@ var MetaOptionProperties = MetaOption({
         },
 
         __getSetters: function(property) {
-            var setters, allSetters = {}, parent = this;
+            var setters, allSetters = {}, parent = this.class.prototype;
 
             while (parent) {
                 if (parent.hasOwnProperty('__setters')) {
-                    for (var property in parent.__setters) {
-                        if (!Helper.inObject(property, allSetters)) {
-                            allSetters[property] = parent.__setters[property];
+                    for (var prop in parent.__setters) {
+                        if (!Helper.inObject(prop, allSetters)) {
+                            allSetters[prop] = parent.__setters[prop];
                         }
                     }
                 }
 
-                parent = parent.parent;
+                parent = parent.class.parent ? parent.class.parent.prototype : null;
             }
 
             if (!Helper.isUndefined(property)) {
@@ -142,18 +142,18 @@ var MetaOptionProperties = MetaOption({
         },
 
         __getGetters: function(property) {
-            var getters, allGetters = {}, parent = this;
+            var getters, allGetters = {}, parent = this.class.prototype;
 
             while (parent) {
                 if (parent.hasOwnProperty('__getters')) {
-                    for (var property in parent.__getters) {
-                        if (!Helper.inObject(property, allGetters)) {
-                            allGetters[property] = parent.__getters[property];
+                    for (var prop in parent.__getters) {
+                        if (!Helper.inObject(prop, allGetters)) {
+                            allGetters[prop] = parent.__getters[prop];
                         }
                     }
                 }
 
-                parent = parent.parent;
+                parent = parent.class.parent ? parent.class.parent.prototype : null;
             }
 
             if (!Helper.isUndefined(property)) {
@@ -307,7 +307,7 @@ var MetaOptionProperties = MetaOption({
         constraints: function(constraints, object, property) {
 
             object.__addSetter(property, function(value) {
-                for (var name in constratins) {
+                for (var name in constraints) {
                     if (!constraints[name].call(this, value)) {
                         throw new Error('Constraint "' + name + '" was failed!');
                     }
