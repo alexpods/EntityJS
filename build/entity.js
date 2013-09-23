@@ -69,7 +69,7 @@ var Helper = {
     isFunction: function(value) {
         return typeof value === 'function';
     },
-    inObject: function(proeprty, object) {
+    inObject: function(property, object) {
         return property in object;
     },
     propertyInObject: function(property, object) {
@@ -93,17 +93,20 @@ var Helper = {
         return name.replace(/(?:_)\w/, function (match) { return match[1].toUpperCase(); });
     },
 
-    createClass: function(constructor, parent, properties) {
-        if (this.isUndefined(body)) {
-            properties   = parent;
-            parent = null;
-        }
+    createClass: function(params) {
 
-        var Clazz = function() { return constructor || (parent && function (data) { parent.call(this, data); }) || function() {} };
-        Clazz.prototype = Object.create(!Helper.isEmpty(parent) ? parent : null);
+        var clazz = params.class
+            || params.parent
+                &&
+                function () {
+                    params.parent.apply(this, Array.prototype.slice.call(arguments));
+                }
+            || function() {}
 
-        var clazz = new Clazz();
-        clazz.prototype = this.extend(Object.create(!Helper.isEmpty(parent) ? parent.prototype : null), properties);
+
+        Helper.extend(clazz, params.parent);
+
+        clazz.prototype = this.extend(Object.create(!Helper.isEmpty(params.parent) ? params.parent.prototype : {}), params.properties);
 
         return clazz;
     }
@@ -121,7 +124,7 @@ var Meta = function(options) {
             this.addOption(option, options[option]);
         }
     }
-    else {
+    else if (!Helper.isUndefined(options)) {
         throw new Error('Wrong meta options argument type!');
     }
 }
@@ -130,7 +133,7 @@ Meta.prototype = {
 
     apply: function() {
         for (var name in this._options) {
-            this._options[name].apply.apply(this._options[name], Array.slice.call(arguments));
+            this._options[name].apply.apply(this._options[name], Array.prototype.slice.call(arguments));
         }
     },
 
@@ -154,7 +157,7 @@ Meta.prototype = {
                 throw new Error('Wrong meta option argument type!');
             }
         }
-        this._options[option.getName()] = option;
+        this._options[option.name] = option;
         return this;
     },
 
@@ -178,12 +181,31 @@ Meta.prototype = {
     }
 };
 var MetaOption = function(name, applier) {
-    if (!Helper.isString(name)) {
-        applier = name;
-        name    = undefined;
+
+    if (this instanceof MetaOption) {
+        if (!Helper.isString(name)) {
+            applier = name;
+            name    = undefined;
+        }
+
+        this.name = name;
+
+        if (Helper.isObject(applier)) {
+            Helper.extend(this, applier);
+        }
+        else if (Helper.isFunction(applier)) {
+            this.applier = applier;
+        }
+        else if (!Helper.isUndefined(applier)) {
+            throw new Error('Wrong meta option applier type!');
+        }
     }
-    this.name    = name;
-    this.applier = applier;
+    else {
+        return Helper.createClass({
+            parent:     MetaOption,
+            properties: Helper.isFunction(name) ? { applier: name } : name
+        });
+    }
 }
 
 MetaOption.prototype = {
@@ -196,23 +218,26 @@ MetaOption.prototype = {
             return;
         }
 
-        var args = [meta[this.name], object].concat(Array.slice.call(arguments,2));
+        var args = [meta[this.name], object].concat(Array.prototype.slice.call(arguments,2));
+        var applier = this.applier || this.defaultApplier;
 
-        Helper.isObject(this.applier)
-            ? this.applier.apply.apply(this.applier, args)
-            : this.applier.apply(this, args);
+        applier.apply(this, args);
     },
 
-    applier: function(meta, object) {
-        var args = [meta[this.name], object].concat(Array.slice.call(arguments,2));
+    defaultApplier: function() {
+        var args = Array.prototype.slice.call(arguments);
+
+        if (!Helper.isUndefined(this.beforeApply)) { this.beforeApply.apply(this, args); }
 
         this.applyInterface.apply(this, args);
         this.applyMeta.apply(this, args);
+
+        if (!Helper.isUndefined(this.afterApply))  { this.afterApply.apply(this, args);  }
     },
 
     applyMeta: function(meta, object) {
         for (var property in meta) {
-            this.Meta.apply.apply(this, [meta[property]].concat(Array.slice.call(arguments,1)));
+            this.Meta.apply.call(this.Meta, meta[property], object, property);
         }
     },
 
@@ -222,7 +247,7 @@ MetaOption.prototype = {
             object['___metaInterfaces'] = [];
         }
 
-        if (-1 === object['___metaInterfaces'][this.name]) {
+        if (-1 === object['___metaInterfaces'].indexOf(this.name)) {
             for (var property in this.Interface) {
                 object[property] = this.Interface[property];
             }
@@ -233,24 +258,21 @@ MetaOption.prototype = {
     Meta: new Meta(),
     Interface: {}
 };
-var MetaOptionConstants = Helper.createClass({ parent: MetaOption, prototype: {
+var MetaOptionConstants = MetaOption({
 
-    applier: function(constants, object) {
+    afterApply: function(constants, object) {
+        object['__constants'] = {};
+
         for (var constant in constants) {
             this.addConstant(constant, object, constants[constant]);
         }
     },
 
     addConstant: function(name, object, constant) {
-        if (!object.hasOwnProperty('__constants')) {
-            object['__constants'] = {};
-        }
         object['__constants'][name] = constant;
     },
 
     Interface: {
-
-        __constants: {},
 
         const: function(name) {
             return this.__getConstant(name);
@@ -295,8 +317,8 @@ var MetaOptionConstants = Helper.createClass({ parent: MetaOption, prototype: {
         }
     }
 
-}});
-var MetaOptionMethods = Helper.createClass({ parent: MetaOption, prototype: {
+});
+var MetaOptionMethods = MetaOption({
 
     applier: function(methods, object) {
         for (var method in methods) {
@@ -308,12 +330,20 @@ var MetaOptionMethods = Helper.createClass({ parent: MetaOption, prototype: {
         object[name] = method;
     }
 
-}});
-var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
+});
+var MetaOptionProperties = MetaOption({
+
+    beforeApply: function(meta, object) {
+
+        for (var property in meta) {
+            object['_' + property] = undefined;
+        }
+
+        object.__setters = {};
+        object.__getters = {}
+    },
 
     Interface: {
-        __setters: {},
-        __getters: {},
 
         init: function(data) {
             this.__setData(data);
@@ -358,6 +388,8 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
                 value = setters[name].call(this, value);
             }
 
+            this['_' + property] = value;
+
             return this;
         },
 
@@ -382,9 +414,6 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             }
             if (!Helper.isFunction(callback)) {
                 throw new Error('Set callback must be a function!');
-            }
-            if (!this.hasOwnProperty('__setters')) {
-                this.__setters = {};
             }
             if (Helper.isUndefined(this.__setters[property])) {
                 this.__setters[property] = [];
@@ -437,9 +466,6 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             if (!Helper.isFunction(callback)) {
                 throw new Error('Get callback must be a function!');
             }
-            if (!this.hasOwnProperty('__getters')) {
-                this.__getters = {};
-            }
             if (Helper.isUndefined(this.__getters[property])) {
                 this.__getters[property] = [];
             }
@@ -487,12 +513,12 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
 
         type: {
 
-            apply: function(type, object, property) {
+            applier: function(type, object, property) {
                 if (!Helper.isArray(type)) {
                     type = [type, {}];
                 }
-                if (!Helper.inObject(type, this.TYPES)) {
-                    throw new Error('Unsopported property type "' + type + '"!');
+                if (!Helper.inObject(type[0], this.TYPES)) {
+                    throw new Error('Unsupported property type "' + type[0] + '"!');
                 }
 
                 var typer = this.TYPES[type[0]];
@@ -544,7 +570,7 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
 
         methods: {
 
-            apply: function(methods, object, property) {
+            applier: function(methods, object, property) {
                 if (!Helper.isArray(methods)) {
                     methods = [methods];
                 }
@@ -559,7 +585,7 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             },
 
             createMethod: function(name, property) {
-                if (Helper.inObject(name, this.METHOD_CREATORS)) {
+                if (!Helper.inObject(name, this.METHOD_CREATORS)) {
                     throw new Error('Unsupported method "' + name + '"!');
                 }
                 return this.METHOD_CREATORS[name](property);
@@ -623,14 +649,14 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             })
         }
     })
-}});
+});
 var Manager = {
 
     _uid:     0,
     _classes: {},
 
     addClass: function(clazz) {
-        this._classes[clazz.__name__] = clazz;
+        this._classes[clazz.NAME] = clazz;
         return this;
     },
 
@@ -732,29 +758,26 @@ var Class = function(data) {
     this.uid = Manager.getNextUid();
 
     this.init(data);
-
-    return this;
 }
 
 Helper.extend(Class, {
 
-    name:   null,
+    NAME:   null,
     parent: null,
 
     create: function(data) {
         return new this(data);
     }
 });
-
-Helper.extend(Class.prototype, {
-
-});
 var ClassBuilder = {
 
     buildClass: function(name, parent, meta) {
-        if (typeof meta == 'undefined') {
+        if (Helper.isUndefined(meta)) {
             meta   = parent;
             parent = undefined;
+        }
+        if (Helper.isString(parent)) {
+            parent = Manager.getClass(parent);
         }
         Event.trigger('BEFORE_CREATE_CLASS', { className: name });
 
@@ -774,7 +797,7 @@ var ClassBuilder = {
         });
 
         Helper.extend(clazz, {
-            name:   name,
+            NAME:   name,
             parent: parent
         });
 
@@ -793,13 +816,11 @@ var ClassBuilder = {
         constants:          new MetaOptionConstants(),
         class_properties:   new MetaOptionProperties(),
         properties:         new MetaOptionProperties(function(meta, clazz) {
-            this.applyInterface(meta, clazz.prototype);
-            this.applyMeta(meta, clazz.prototype);
+            this.defaultApplier(meta, clazz.prototype);
         }),
         class_methods:      new MetaOptionMethods(),
         methods:            new MetaOptionMethods(function(meta, clazz) {
-            this.applyInterface(meta, clazz.prototype);
-            this.applyMeta(meta, clazz.prototype);
+            this.defaultApplier(meta, clazz.prototype);
         })
     })
 };
