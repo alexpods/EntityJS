@@ -4,7 +4,7 @@ var Manager = {
     _classes: {},
 
     addClass: function(clazz) {
-        this._classes[clazz.__name__] = clazz;
+        this._classes[clazz.NAME] = clazz;
         return this;
     },
 

@@ -48,7 +48,7 @@ var Helper = {
     isFunction: function(value) {
         return typeof value === 'function';
     },
-    inObject: function(proeprty, object) {
+    inObject: function(property, object) {
         return property in object;
     },
     propertyInObject: function(property, object) {
@@ -72,17 +72,20 @@ var Helper = {
         return name.replace(/(?:_)\w/, function (match) { return match[1].toUpperCase(); });
     },
 
-    createClass: function(constructor, parent, properties) {
-        if (this.isUndefined(body)) {
-            properties   = parent;
-            parent = null;
-        }
+    createClass: function(params) {
 
-        var Clazz = function() { return constructor || (parent && function (data) { parent.call(this, data); }) || function() {} };
-        Clazz.prototype = Object.create(!Helper.isEmpty(parent) ? parent : null);
+        var clazz = params.class
+            || params.parent
+                &&
+                function () {
+                    params.parent.apply(this, Array.prototype.slice.call(arguments));
+                }
+            || function() {}
 
-        var clazz = new Clazz();
-        clazz.prototype = this.extend(Object.create(!Helper.isEmpty(parent) ? parent.prototype : null), properties);
+
+        Helper.extend(clazz, params.parent);
+
+        clazz.prototype = this.extend(Object.create(!Helper.isEmpty(params.parent) ? params.parent.prototype : {}), params.properties);
 
         return clazz;
     }

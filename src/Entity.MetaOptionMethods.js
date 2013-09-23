@@ -1,4 +1,4 @@
-var MetaOptionMethods = Helper.createClass({ parent: MetaOption, prototype: {
+var MetaOptionMethods = MetaOption({
 
     applier: function(methods, object) {
         for (var method in methods) {
@@ -10,4 +10,4 @@ var MetaOptionMethods = Helper.createClass({ parent: MetaOption, prototype: {
         object[name] = method;
     }
 
-}});
+});

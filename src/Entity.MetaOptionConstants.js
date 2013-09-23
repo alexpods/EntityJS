@@ -1,21 +1,18 @@
-var MetaOptionConstants = Helper.createClass({ parent: MetaOption, prototype: {
+var MetaOptionConstants = MetaOption({
 
-    applier: function(constants, object) {
+    afterApply: function(constants, object) {
+        object['__constants'] = {};
+
         for (var constant in constants) {
             this.addConstant(constant, object, constants[constant]);
         }
     },
 
     addConstant: function(name, object, constant) {
-        if (!object.hasOwnProperty('__constants')) {
-            object['__constants'] = {};
-        }
         object['__constants'][name] = constant;
     },
 
     Interface: {
-
-        __constants: {},
 
         const: function(name) {
             return this.__getConstant(name);
@@ -60,4 +57,4 @@ var MetaOptionConstants = Helper.createClass({ parent: MetaOption, prototype: {
         }
     }
 
-}});
+});

@@ -1,9 +1,12 @@
 var ClassBuilder = {
 
     buildClass: function(name, parent, meta) {
-        if (typeof meta == 'undefined') {
+        if (Helper.isUndefined(meta)) {
             meta   = parent;
             parent = undefined;
+        }
+        if (Helper.isString(parent)) {
+            parent = Manager.getClass(parent);
         }
         Event.trigger('BEFORE_CREATE_CLASS', { className: name });
 
@@ -23,7 +26,7 @@ var ClassBuilder = {
         });
 
         Helper.extend(clazz, {
-            name:   name,
+            NAME:   name,
             parent: parent
         });
 
@@ -42,13 +45,11 @@ var ClassBuilder = {
         constants:          new MetaOptionConstants(),
         class_properties:   new MetaOptionProperties(),
         properties:         new MetaOptionProperties(function(meta, clazz) {
-            this.applyInterface(meta, clazz.prototype);
-            this.applyMeta(meta, clazz.prototype);
+            this.defaultApplier(meta, clazz.prototype);
         }),
         class_methods:      new MetaOptionMethods(),
         methods:            new MetaOptionMethods(function(meta, clazz) {
-            this.applyInterface(meta, clazz.prototype);
-            this.applyMeta(meta, clazz.prototype);
+            this.defaultApplier(meta, clazz.prototype);
         })
     })
 };

@@ -11,7 +11,7 @@ var Meta = function(options) {
             this.addOption(option, options[option]);
         }
     }
-    else {
+    else if (!Helper.isUndefined(options)) {
         throw new Error('Wrong meta options argument type!');
     }
 }
@@ -20,7 +20,7 @@ Meta.prototype = {
 
     apply: function() {
         for (var name in this._options) {
-            this._options[name].apply.apply(this._options[name], Array.slice.call(arguments));
+            this._options[name].apply.apply(this._options[name], Array.prototype.slice.call(arguments));
         }
     },
 
@@ -44,7 +44,7 @@ Meta.prototype = {
                 throw new Error('Wrong meta option argument type!');
             }
         }
-        this._options[option.getName()] = option;
+        this._options[option.name] = option;
         return this;
     },
 

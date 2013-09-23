@@ -1,10 +1,29 @@
 var MetaOption = function(name, applier) {
-    if (!Helper.isString(name)) {
-        applier = name;
-        name    = undefined;
+
+    if (this instanceof MetaOption) {
+        if (!Helper.isString(name)) {
+            applier = name;
+            name    = undefined;
+        }
+
+        this.name = name;
+
+        if (Helper.isObject(applier)) {
+            Helper.extend(this, applier);
+        }
+        else if (Helper.isFunction(applier)) {
+            this.applier = applier;
+        }
+        else if (!Helper.isUndefined(applier)) {
+            throw new Error('Wrong meta option applier type!');
+        }
     }
-    this.name    = name;
-    this.applier = applier;
+    else {
+        return Helper.createClass({
+            parent:     MetaOption,
+            properties: Helper.isFunction(name) ? { applier: name } : name
+        });
+    }
 }
 
 MetaOption.prototype = {
@@ -17,23 +36,26 @@ MetaOption.prototype = {
             return;
         }
 
-        var args = [meta[this.name], object].concat(Array.slice.call(arguments,2));
+        var args = [meta[this.name], object].concat(Array.prototype.slice.call(arguments,2));
+        var applier = this.applier || this.defaultApplier;
 
-        Helper.isObject(this.applier)
-            ? this.applier.apply.apply(this.applier, args)
-            : this.applier.apply(this, args);
+        applier.apply(this, args);
     },
 
-    applier: function(meta, object) {
-        var args = [meta[this.name], object].concat(Array.slice.call(arguments,2));
+    defaultApplier: function() {
+        var args = Array.prototype.slice.call(arguments);
+
+        if (!Helper.isUndefined(this.beforeApply)) { this.beforeApply.apply(this, args); }
 
         this.applyInterface.apply(this, args);
         this.applyMeta.apply(this, args);
+
+        if (!Helper.isUndefined(this.afterApply))  { this.afterApply.apply(this, args);  }
     },
 
     applyMeta: function(meta, object) {
         for (var property in meta) {
-            this.Meta.apply.apply(this, [meta[property]].concat(Array.slice.call(arguments,1)));
+            this.Meta.apply.call(this.Meta, meta[property], object, property);
         }
     },
 
@@ -43,7 +65,7 @@ MetaOption.prototype = {
             object['___metaInterfaces'] = [];
         }
 
-        if (-1 === object['___metaInterfaces'][this.name]) {
+        if (-1 === object['___metaInterfaces'].indexOf(this.name)) {
             for (var property in this.Interface) {
                 object[property] = this.Interface[property];
             }

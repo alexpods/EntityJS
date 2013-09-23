@@ -1,8 +1,16 @@
-var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
+var MetaOptionProperties = MetaOption({
+
+    beforeApply: function(meta, object) {
+
+        for (var property in meta) {
+            object['_' + property] = undefined;
+        }
+
+        object.__setters = {};
+        object.__getters = {}
+    },
 
     Interface: {
-        __setters: {},
-        __getters: {},
 
         init: function(data) {
             this.__setData(data);
@@ -47,6 +55,8 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
                 value = setters[name].call(this, value);
             }
 
+            this['_' + property] = value;
+
             return this;
         },
 
@@ -71,9 +81,6 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             }
             if (!Helper.isFunction(callback)) {
                 throw new Error('Set callback must be a function!');
-            }
-            if (!this.hasOwnProperty('__setters')) {
-                this.__setters = {};
             }
             if (Helper.isUndefined(this.__setters[property])) {
                 this.__setters[property] = [];
@@ -126,9 +133,6 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             if (!Helper.isFunction(callback)) {
                 throw new Error('Get callback must be a function!');
             }
-            if (!this.hasOwnProperty('__getters')) {
-                this.__getters = {};
-            }
             if (Helper.isUndefined(this.__getters[property])) {
                 this.__getters[property] = [];
             }
@@ -176,12 +180,12 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
 
         type: {
 
-            apply: function(type, object, property) {
+            applier: function(type, object, property) {
                 if (!Helper.isArray(type)) {
                     type = [type, {}];
                 }
-                if (!Helper.inObject(type, this.TYPES)) {
-                    throw new Error('Unsopported property type "' + type + '"!');
+                if (!Helper.inObject(type[0], this.TYPES)) {
+                    throw new Error('Unsupported property type "' + type[0] + '"!');
                 }
 
                 var typer = this.TYPES[type[0]];
@@ -233,7 +237,7 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
 
         methods: {
 
-            apply: function(methods, object, property) {
+            applier: function(methods, object, property) {
                 if (!Helper.isArray(methods)) {
                     methods = [methods];
                 }
@@ -248,7 +252,7 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             },
 
             createMethod: function(name, property) {
-                if (Helper.inObject(name, this.METHOD_CREATORS)) {
+                if (!Helper.inObject(name, this.METHOD_CREATORS)) {
                     throw new Error('Unsupported method "' + name + '"!');
                 }
                 return this.METHOD_CREATORS[name](property);
@@ -312,4 +316,4 @@ var MetaOptionProperties = Helper.createClass({ parent: MetaOption, prototype: {
             })
         }
     })
-}});
+});
