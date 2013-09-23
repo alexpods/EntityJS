@@ -1,6 +1,6 @@
 var MetaOptionMethods = MetaOption({
 
-    applier: function(methods, object) {
+    afterApply: function(methods, object) {
         for (var method in methods) {
             this.addMethod(method, object, methods[method]);
         }
