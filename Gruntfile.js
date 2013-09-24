@@ -3,12 +3,13 @@
 module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON("package.json"),
         concat: {
-            EntityJS: {
-                dest: "build/entity.js",
+            dev: {
+                dest: "build/<%= pkg.title %>.js",
                 src: [
                     "src/.prefix",
 
@@ -29,8 +30,23 @@ module.exports = function(grunt) {
                     "src/.suffix"
                 ]
             }
+        },
+        uglify: {
+            min: {
+                options: {
+                    mangle: true,
+                    compress: {
+                        unused: false
+                    },
+                    report: 'gzip',
+                    sourceMap: 'build/<%= pkg.title %>.min.map',
+                    preserveComments: false
+                },
+                dest: "build/<%= pkg.title %>.min.js",
+                src:  "<%= concat.dev.dest %>"
+            }
         }
     })
 
-    grunt.registerTask('default', ['concat']);
+    grunt.registerTask('default', ['concat', 'uglify']);
 };

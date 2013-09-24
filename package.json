@@ -1,5 +1,6 @@
 {
   "name": "entity-js",
+  "title": "EntityJS",
   "version": "0.1.0",
   "description": "Portable JavasScript OOP library for entity manipulation",
   "author": {
@@ -20,7 +21,8 @@
   },
   "devDependencies": {
     "grunt": "~0.4.1",
-    "grunt-contrib-concat": "~0.3.0"
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-uglify": "~0.2.4"
   },
   "readmeFilename": "README.md"
 }
