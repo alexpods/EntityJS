@@ -9,7 +9,7 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON("package.json"),
         concat: {
             dev: {
-                dest: "build/<%= pkg.title %>.js",
+                dest: "dist/<%= pkg.title %>.js",
                 src: [
                     "src/.prefix",
 
@@ -39,10 +39,10 @@ module.exports = function(grunt) {
                         unused: false
                     },
                     report: 'gzip',
-                    sourceMap: 'build/<%= pkg.title %>.min.map',
+                    sourceMap: 'dist/<%= pkg.title %>.min.map',
                     preserveComments: false
                 },
-                dest: "build/<%= pkg.title %>.min.js",
+                dest: "dist/<%= pkg.title %>.min.js",
                 src:  "<%= concat.dev.dest %>"
             }
         }
