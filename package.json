@@ -1,7 +1,7 @@
 {
   "name": "entity-js",
   "title": "EntityJS",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Portable JavasScript OOP library for entity manipulation",
   "author": {
     "name": "Aleksey Podskrebyshev (Alex Pods)",
