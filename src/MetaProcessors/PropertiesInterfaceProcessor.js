@@ -1,7 +1,7 @@
 var PropertiesInterfaceProcessor = new Meta.Processor.Interface({
 
-    _setters: {},
-    _getters: {},
+    __setters: {},
+    __getters: {},
 
     init: function(data) {
         this.__setData(data);
