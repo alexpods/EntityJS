@@ -9,7 +9,7 @@ var PropertiesMetaProcessor = {
     Meta: new Meta({
 
         type: {
-            process: function(type, object, option, property) {
+            process: function(object, type, option, property) {
                 if (!Helper.isArray(type)) {
                     type = [type, {}];
                 }
@@ -57,7 +57,7 @@ var PropertiesMetaProcessor = {
             }
         },
 
-        default: function(defaultValue, object, option, property) {
+        default: function(object, defaultValue, option, property) {
             if (Helper.isFunction(defaultValue)) {
                 defaultValue = defaultValue();
             }
@@ -66,7 +66,7 @@ var PropertiesMetaProcessor = {
 
         methods: {
 
-            process: function(methods, object, option, property) {
+            process: function(object, methods, option, property) {
                 if (!Helper.isArray(methods)) {
                     methods = [methods];
                 }
@@ -123,7 +123,7 @@ var PropertiesMetaProcessor = {
             }
         },
 
-        converters: function(converters, object, option, property) {
+        converters: function(object, converters, option, property) {
 
             object.__addSetter(property, 1000, function(value) {
                 for (var name in converters) {
@@ -133,7 +133,7 @@ var PropertiesMetaProcessor = {
             })
         },
 
-        constraints: function(constraints, object, option, property) {
+        constraints: function(object, constraints, option, property) {
 
             object.__addSetter(property, function(value) {
                 for (var name in constraints) {
