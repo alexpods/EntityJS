@@ -234,9 +234,7 @@ Helper.extend(Class, {
 });
 
 Helper.extend(Class.prototype, {
-
     class: Class
-    
 });
 var ClassBuilder = {
 
