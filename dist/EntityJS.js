@@ -682,15 +682,15 @@ var PropertiesProcessor = new Meta.Processor.Chain({
         Class:        Class,
         ClassBuilder: ClassBuilder,
         Event:        Event
-    });
+    })
 
-    Entity.Meta.Class.addOptions({
+    Entity.Meta.Class = new Meta({
         constants:        ConstantsProcessor,
         class_properties: PropertiesProcessor,
         class_methods:    MethodsProcessor
-    });
+    })
 
-    Entity.Meta.Object.addOptions({
+    Entity.Meta.Object = new Meta({
         properties:       PropertiesProcessor,
         methods:          MethodsProcessor
     })
