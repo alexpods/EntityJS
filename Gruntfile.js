@@ -14,18 +14,12 @@ module.exports = function(grunt) {
                     "src/.prefix",
 
                     "src/Entity.js",
-                    "src/Entity.Helper.js",
-
-                    "src/Entity.Meta.js",
-                    "src/Entity.MetaOption.js",
-                    "src/Entity.MetaOptionConstants.js",
-                    "src/Entity.MetaOptionMethods.js",
-                    "src/Entity.MetaOptionProperties.js",
-
-                    "src/Entity.Manager.js",
-                    "src/Entity.Event.js",
-                    "src/Entity.Class.js",
-                    "src/Entity.ClassBuilder.js",
+                    "src/Helper.js",
+                    "src/Manager.js",
+                    "src/Event.js",
+                    "src/Class.js",
+                    "src/ClassBuilder.js",
+                    "src/"
 
                     "src/.suffix"
                 ]

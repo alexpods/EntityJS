@@ -4,14 +4,19 @@
         Manager:      Manager,
         Class:        Class,
         ClassBuilder: ClassBuilder,
-        Event:        Event,
-        Meta:         Meta,
-        MetaOption:   MetaOption,
-
-        MetaOptionConstants:  MetaOptionConstants,
-        MetaOptionMethods:    MetaOptionMethods,
-        MetaOptionProperties: MetaOptionProperties
+        Event:        Event
     });
+
+    Entity.Meta.Class.addOptions({
+        constants:        ConstantsProcessor,
+        class_properties: PropertiesProcessor,
+        class_methods:    MethodsProcessor
+    });
+
+    Entity.Meta.Object.addOptions({
+        properties:       PropertiesProcessor,
+        methods:          MethodsProcessor
+    })
 
     global.Entity = Entity;
 

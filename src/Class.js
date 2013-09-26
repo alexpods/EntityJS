@@ -13,9 +13,3 @@ Helper.extend(Class, {
         return new this(data);
     }
 });
-
-Helper.extend(Class.prototype, {
-
-    class: Class
-
-});

@@ -16,3 +16,5 @@ var Entity = function(name, parent, meta) {
         return clazz;
     }
 }
+
+Entity.Meta = new Meta();
