@@ -19,7 +19,8 @@ module.exports = function(grunt) {
                     "src/Event.js",
                     "src/Class.js",
                     "src/ClassBuilder.js",
-                    "src/"
+
+                    "src/MetaProcessors/*.js",
 
                     "src/.suffix"
                 ]
